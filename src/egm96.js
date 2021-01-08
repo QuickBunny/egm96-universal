@@ -59,18 +59,14 @@ export function meanSeaLevel (latitude, longitude) {
   const leftProp = (lon - lonLeft) / INTERVAL
   const topProp = (latTop - lat) / INTERVAL
 
-  return bilinearInterpolation(topLeft, bottomLeft, bottomRight, topRight, leftProp, topProp)
-}
+  const pll = (1.0 - leftProp) * (1.0 - topProp)
+  const plr = leftProp * (1.0 - topProp)
+  const pur = leftProp * topProp
+  const pul = (1.0 - leftProp) * topProp
 
-const bilinearInterpolation = (topLeft, bottomLeft, bottomRight, topRight, x, y) => {
-  const top = linearInterpolation(topLeft, topRight, x)
-  const bottom = linearInterpolation(bottomLeft, bottomRight, x)
+  const offset = pll * bottomLeft + plr * bottomRight + pur * topRight + pul * topLeft
 
-  return linearInterpolation(top, bottom, y)
-}
-
-const linearInterpolation = (a, b, prop) => {
-  return a + ((b - a) * prop)
+  return offset // convert centimeters to meters
 }
 
 /**
